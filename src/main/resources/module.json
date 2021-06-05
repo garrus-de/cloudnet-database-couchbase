@@ -1,0 +1,37 @@
+{
+  "runtimeModule": true,
+  "group": "de.garrus.cloudnet",
+  "name": "CloudNet-Database-Couchbase",
+  "version": "1.0",
+  "author": "garrus.de",
+  "website": "https://garrus.de",
+  "description": "CloudNet extension, which includes the database support for Couchbase database to store",
+  "main": "de.garrus.cloudnet.couchbase.CloudnetCouchbaseModule",
+  "storesSensitiveData": true,
+  "dependencies": [
+    {
+      "group": "com.couchbase.client",
+      "name": "java-client",
+      "version": "3.1.3",
+      "repo": "maven"
+    },
+    {
+      "group": "com.couchbase.client",
+      "name": "core-io",
+      "version": "2.1.3",
+      "repo": "maven"
+    },
+    {
+      "group": "io.projectreactor",
+      "name": "reactor-core",
+      "version": "3.4.3",
+      "repo": "maven"
+    },
+    {
+      "group": "org.reactivestreams",
+      "name": "reactive-streams",
+      "version": "1.0.3",
+      "repo": "maven"
+    }
+  ]
+}
