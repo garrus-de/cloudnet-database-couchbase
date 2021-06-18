@@ -3,17 +3,15 @@ package de.garrus.cloudnet.couchbase;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
-import com.couchbase.client.java.manager.collection.GetAllScopesOptions;
 import com.couchbase.client.java.manager.collection.ScopeSpec;
 import com.google.common.base.Preconditions;
-import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.common.collection.NetorHashMap;
 import de.dytanic.cloudnet.common.collection.Pair;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
 import de.dytanic.cloudnet.database.IDatabase;
+import de.dytanic.cloudnet.driver.database.Database;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,7 +24,7 @@ import java.util.concurrent.Executors;
 @Getter
 public class CouchbaseDatabaseProvider extends AbstractDatabaseProvider {
     private static final long NEW_CREATION_DELAY = 600000L;
-    protected final NetorHashMap<String, Long, IDatabase> cachedDatabaseInstances = new NetorHashMap<>();
+    protected final NetorHashMap<String, Long, Database> cachedDatabaseInstances = new NetorHashMap<>();
     private final JsonDocument config;
     private final boolean autoShutdownExecutorService;
     private Cluster cluster;
@@ -53,7 +51,7 @@ public class CouchbaseDatabaseProvider extends AbstractDatabaseProvider {
         return true;
     }
 
-    public IDatabase getDatabase(String name) {
+    public Database getDatabase(String name) {
         Preconditions.checkNotNull(name);
         this.removedOutdatedEntries();
         if (!this.cachedDatabaseInstances.contains(name)) {
@@ -98,10 +96,10 @@ public class CouchbaseDatabaseProvider extends AbstractDatabaseProvider {
     }
 
     private void removedOutdatedEntries() {
-        Iterator<Map.Entry<String, Pair<Long, IDatabase>>> var1 = this.cachedDatabaseInstances.entrySet().iterator();
+        Iterator<Map.Entry<String, Pair<Long, Database>>> var1 = this.cachedDatabaseInstances.entrySet().iterator();
 
         while (var1.hasNext()) {
-            Map.Entry<String, Pair<Long, IDatabase>> entry = var1.next();
+            Map.Entry<String, Pair<Long, Database>> entry = var1.next();
             if ((Long) ((Pair) entry.getValue()).getFirst() < System.currentTimeMillis()) {
                 this.cachedDatabaseInstances.remove(entry.getKey());
             }
@@ -109,7 +107,7 @@ public class CouchbaseDatabaseProvider extends AbstractDatabaseProvider {
 
     }
 
-    public NetorHashMap<String, Long, IDatabase> getCachedDatabaseInstances() {
+    public NetorHashMap<String, Long, Database> getCachedDatabaseInstances() {
         return this.cachedDatabaseInstances;
     }
 

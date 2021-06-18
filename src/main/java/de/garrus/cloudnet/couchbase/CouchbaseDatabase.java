@@ -6,13 +6,11 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
 import com.couchbase.client.java.manager.collection.ScopeSpec;
 import com.couchbase.client.java.query.QueryResult;
-import com.google.gson.Gson;
 import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.common.concurrent.ITask;
 import de.dytanic.cloudnet.common.concurrent.ListenableTask;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
-import de.dytanic.cloudnet.database.IDatabase;
+import de.dytanic.cloudnet.driver.database.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
-public class CouchbaseDatabase implements IDatabase {
+public class CouchbaseDatabase implements Database {
     private final CouchbaseDatabaseProvider provider;
     private final String name;
     private final Collection collection;
@@ -46,13 +44,12 @@ public class CouchbaseDatabase implements IDatabase {
         }
 
         this.collection = provider.getBucket().collection(name);
+
+        if (!exists) {
+            provider.getCluster().query("CREATE PRIMARY INDEX ON `default`:`" + collection.bucketName() + "`.`" + collection.scopeName() + "`.`" + collection.name() + "`");
+        }
         this.name = name;
         this.executorService = service;
-    }
-
-    @Override
-    public AbstractDatabaseProvider getDatabaseProvider() {
-        return provider;
     }
 
     @Override
@@ -189,6 +186,11 @@ public class CouchbaseDatabase implements IDatabase {
     @Override
     public long getDocumentsCount() {
         return keys().size();
+    }
+
+    @Override
+    public boolean isSynced() {
+        return false;
     }
 
     @Override
