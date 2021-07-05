@@ -1,7 +1,10 @@
 package de.garrus.cloudnet.couchbase;
 
+import com.couchbase.client.core.env.LoggerConfig;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.ClusterOptions;
+import com.couchbase.client.java.env.ClusterEnvironment;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
 import com.couchbase.client.java.manager.collection.ScopeSpec;
 import com.google.common.base.Preconditions;
@@ -9,7 +12,6 @@ import de.dytanic.cloudnet.common.collection.NetorHashMap;
 import de.dytanic.cloudnet.common.collection.Pair;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
-import de.dytanic.cloudnet.database.IDatabase;
 import de.dytanic.cloudnet.driver.database.Database;
 import lombok.Getter;
 
@@ -46,7 +48,11 @@ public class CouchbaseDatabaseProvider extends AbstractDatabaseProvider {
     }
 
     public boolean init() {
-        this.cluster = Cluster.connect(config.getString("host"), config.getString("username"), config.getString("password"));
+
+        ClusterEnvironment environment = ClusterEnvironment.builder().loggerConfig(LoggerConfig.customLogger(new CouchbaseCloudNetLogger())).build();
+        ClusterOptions options = ClusterOptions.clusterOptions(config.getString("username"), config.getString("password")).environment(environment);
+
+        this.cluster = Cluster.connect(config.getString("host"), options);
         this.bucket = cluster.bucket(config.getString("bucket"));
         return true;
     }
